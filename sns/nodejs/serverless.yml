@@ -1,0 +1,27 @@
+service: sns-node
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - sns:
+          arn: !Ref SnsTopic
+          topicName: MyCustomTopic
+  hello2:
+    handler: handler2.hello
+    events:
+      - sns:
+          arn: !Ref SnsTopic
+          topicName: MyCustomTopic
+
+
+resources:
+  Resources:
+    SnsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: testTopic
