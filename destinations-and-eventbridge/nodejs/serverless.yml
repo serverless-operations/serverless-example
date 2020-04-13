@@ -1,0 +1,33 @@
+service: destinations
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+functions:
+  helloStarting:
+    handler: handler.hello
+    destinations:
+      onSuccess: arn:aws:events:#{AWS::Region}:#{AWS::AccountId}:event-bus/test-${self:provider.stage}
+      onFailure: helloFailure
+  helloSuccess:
+    handler: handler.success
+    events:
+      - eventBridge:
+          eventBus: arn:aws:events:#{AWS::Region}:#{AWS::AccountId}:event-bus/test-${self:provider.stage}
+          pattern:
+            detail:
+              responsePayload:
+                source:
+                  - test.action
+  helloFailure:
+    handler: handler.fail
+
+resources:
+  Resources:
+    TestEventBus:
+      Type: AWS::Events::EventBus
+      Properties: 
+        Name: test-${self:provider.stage}
+plugins:
+  - serverless-pseudo-parameters
