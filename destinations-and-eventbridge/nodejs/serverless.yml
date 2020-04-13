@@ -8,13 +8,13 @@ functions:
   helloStarting:
     handler: handler.hello
     destinations:
-      onSuccess: arn:aws:events:#{AWS::Region}:#{AWS::AccountId}:event-bus/test-${self:provider.stage}
+      onSuccess: arn:aws:events:#{AWS::Region}:#{AWS::AccountId}:event-bus/${self:custom.eventBusName}
       onFailure: helloFailure
   helloSuccess:
     handler: handler.success
     events:
       - eventBridge:
-          eventBus: arn:aws:events:#{AWS::Region}:#{AWS::AccountId}:event-bus/test-${self:provider.stage}
+          eventBus: arn:aws:events:#{AWS::Region}:#{AWS::AccountId}:event-bus/${self:custom.eventBusName}
           pattern:
             detail:
               responsePayload:
@@ -28,6 +28,8 @@ resources:
     TestEventBus:
       Type: AWS::Events::EventBus
       Properties: 
-        Name: test-${self:provider.stage}
+        Name: ${self:custom.eventBusName}
+custom:
+  eventBusName: test-${self:provider.stage}
 plugins:
   - serverless-pseudo-parameters
